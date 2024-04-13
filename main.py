@@ -14,6 +14,7 @@ import json
 import webbrowser
 import pathlib
 import ssl
+import threading
 
 root = Tk()
 video = None
@@ -269,37 +270,53 @@ def audiostream():
             widget.configure(state="disabled")
 
 def downloadstream():
-    dashFlag = False
-    if audioButton.cget('state')=="disabled":
-        processLabel.config(text="Downloading audio..")
-        processLabel.update()
-        out_path = video.streams.get_audio_only().download()
-        processLabel.config(text="Your audio has been downloaded!")
+    # Function to start the download in a separate thread
+    def start_download():
+        try:
+            dashFlag = False
+            if audioButton.cget('state')=="disabled":
+                processLabel.config(text="Downloading audio..")
+                processLabel.update()
+                out_path = video.streams.get_audio_only().download()
+                processLabel.config(text="Your audio has been downloaded!")
 
-    else:
-        resolution = resVar.get()
-        if(video.streams.filter(res=resolution, subtype="mp4").first()).is_adaptive:
-            dashFlag = True
-        if dashFlag: 
-            processLabel.config(text="Downloading video..")
-            processLabel.update()
-            out_path = video.streams.filter(res=resolution, subtype="mp4").first().download()
-            idtfier = out_path.split('.')
-            os.rename(out_path, f"Video." + idtfier[-1])
-            processLabel.config(text="Downloading audio..")
-            processLabel.update()
-            out_path = video.streams.get_audio_only().download()
-            idtfier = out_path.split('.')
-            os.rename(out_path, f"Audio." + idtfier[-1])
-            processLabel.config(text="Merging audio and video files..")
-            processLabel.update()
-            subprocess.run(f"ffmpeg -hide_banner -loglevel error -i Video.mp4 -i Audio.mp4 -c copy Output.mp4", shell=True)
-            os.remove("Audio.mp4")
-            os.remove("Video.mp4")
-            processLabel.config(text="Your video has been downloaded!")
-        else:
-            out_path = video.streams.filter(progressive=True, res=resolution).first().download()
-            processLabel.config(text="Your video has been downloaded!")
+            else:
+                resolution = resVar.get()
+                if(video.streams.filter(res=resolution, subtype="mp4").first()).is_adaptive:
+                    dashFlag = True
+                if dashFlag: 
+                    processLabel.config(text="Downloading video..")
+                    processLabel.update()
+                    out_path = video.streams.filter(res=resolution, subtype="mp4").first().download()
+                    idtfier = out_path.split('.')
+                    os.rename(out_path, f"Video." + idtfier[-1])
+                    processLabel.config(text="Downloading audio..")
+                    processLabel.update()
+                    out_path = video.streams.get_audio_only().download()
+                    idtfier = out_path.split('.')
+                    os.rename(out_path, f"Audio." + idtfier[-1])
+                    processLabel.config(text="Merging audio and video files..")
+                    processLabel.update()
+                    subprocess.run(f"ffmpeg -hide_banner -loglevel error -i Video.mp4 -i Audio.mp4 -c copy Output.mp4", shell=True)
+                    os.remove("Audio.mp4")
+                    os.remove("Video.mp4")
+                    processLabel.config(text="Your video has been downloaded!")
+                else:
+                    out_path = video.streams.filter(progressive=True, res=resolution).first().download()
+                    processLabel.config(text="Your video has been downloaded!")
+
+        except Exception as e:
+            print(e)
+        finally:
+            # Re-enable the download button after completion
+            downloadButton.config(state="active")
+
+    # Disable the download button while downloading
+    downloadButton.config(state="disabled")
+
+    # Create a new thread for downloading
+    download_thread = threading.Thread(target=start_download)
+    download_thread.start()
 
 def on_progress(stream, chunk, bytes_remaining):
     total_size = stream.filesize
