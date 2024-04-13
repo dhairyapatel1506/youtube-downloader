@@ -226,9 +226,13 @@ def submit():
         for widget in root.winfo_children():
                 if isinstance(widget, Radiobutton):
                     widget.configure(state="disabled")
-    except:
-        TitleLabel.config(text="Please enter a valid url.")
-        pass
+    except Exception as e:
+        if("regex_search" in str(e)):
+            TitleLabel.config(text="Please enter a valid url.")
+        elif("is unavailable" in str(e)):
+            TitleLabel.config(text="Not a valid Youtube video.")
+        else:
+            print(e)
 
 def videostream():
     rbsExist = False
