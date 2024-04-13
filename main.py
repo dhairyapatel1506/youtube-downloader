@@ -214,10 +214,10 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 
 def submit():
     global video
-    authenticateButton.config(state="active")
     url = urlEntry.get()
     try:
         if(authRVar.get()=="yes" or os.path.exists(_token_file)):
+            authenticateButton.config(state="active")
             video = YouTube(url, on_progress_callback=on_progress, use_oauth=True)
         else:
             video = YouTube(url, on_progress_callback=on_progress)
