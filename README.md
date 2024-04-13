@@ -21,7 +21,9 @@ A pytube-based Youtube Downloader with a GUI.
 # Usage
 Run: ```python main.py```
 ## Authentication
-This step is optional. If you choose _No_, OAuth will not be used and you can download videos without any additional steps. Use this option only if you wish to bypass age-restricted videos or have trouble downloading certain videos. Once successfully authenticated, you will never be asked to do so again till your token expires or the _tokens.json_ file is deleted.
+This step is optional. If you choose _No_, OAuth will not be used and you can download videos without any additional steps. Use this option only if you wish to bypass age-restricted videos or have trouble downloading certain videos. 
+
+Once successfully authenticated, you will never be asked to do so again till your token expires or the _tokens.json_ file is deleted.
 <p align="center"> <img src="https://github.com/dhairyapatel1506/youtube-downloader/assets/101339040/018f365f-7546-4c80-8034-5ec19ddc401a"> </p>
 
 If you do wish to use OAuth, follow these steps:
