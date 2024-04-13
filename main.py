@@ -302,14 +302,17 @@ def downloadstream():
             processLabel.config(text="Your video has been downloaded!")
 
 def on_progress(stream, chunk, bytes_remaining):
+    old_perc = 0
     total_size = stream.filesize
     bytes_downloaded = total_size - bytes_remaining
     percentage_of_completion = bytes_downloaded / total_size * 100
-    per = str(int(percentage_of_completion))
-    progressLabel.config(text=per + '%')
-    progressLabel.update()
-    progressBar.config(value=percentage_of_completion)
-    progressBar.update()
+    if(percentage_of_completion-old_perc>25):
+        per = str(int(percentage_of_completion))
+        old_perc = percentage_of_completion
+        progressLabel.config(text=per + '%')
+        progressLabel.update()
+        progressBar.config(value=percentage_of_completion)
+        progressBar.update()
 
 def _new_fetch_bearer_token(self):
     """Fetch an OAuth token."""
