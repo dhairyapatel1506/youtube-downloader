@@ -13,6 +13,7 @@ import time
 import json
 import webbrowser
 import pathlib
+import ssl
 
 root = Tk()
 video = None
@@ -209,6 +210,7 @@ _default_clients = {
 }
 _cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
 _token_file = os.path.join(_cache_dir, 'tokens.json')
+ssl._create_default_https_context = ssl._create_stdlib_context
 
 def submit():
     global video
