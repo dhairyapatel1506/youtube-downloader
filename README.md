@@ -2,6 +2,11 @@
 A pytube-based Youtube Downloader with a GUI.
 <p align="center"> <img src="https://github.com/dhairyapatel1506/youtube-downloader/assets/101339040/d8866e33-cc5f-48b8-b628-f77ce2f113cf"> </p>
 
+# Features
+- Options to download different video qualities.
+- Option to download only audio.
+- Ability to bypass age-restricted videos.
+
 # Requirements
 - Python
 	- pytube
@@ -48,3 +53,7 @@ If you do wish to use OAuth, follow these steps:
   - Finally, click on the Authenticate button.
 
 You've successfully completed your OAuth process.
+
+# ToDo
+  <p>☐ Implement multi-threaded downloading to increase download speeds.</p>
+  <p>☐ Shift the default clients to a separate file to free up space in the code.</p>
