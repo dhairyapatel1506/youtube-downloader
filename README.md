@@ -9,10 +9,10 @@ A pytube-based Youtube Downloader with a GUI.
 - <a href="https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0-essentials_build.zip">ffmpeg.exe</a>
 
 # Setup
-- **Step 1: Install the pytube library.**
-  - ```pip install pytube```
-- **Step 2: Install the ffmpeg library.**
-  - ```pip install ffmpeg```
+- **Step 1: Clone the repository.**
+  - ```git clone https://github.com/dhairyapatel1506/youtube-downloader.git```
+- **Step 2: Install the python dependencies.**
+  - ```pip install -r requirements.txt```
 - **Step 3: Download and setup the ffmpeg executable file.**
   1. You can download the ffmpeg zip file directly from **Requirements** or you can find it on their official <a href="https://ffmpeg.org/download.html">website</a>.
   2. Once it's downloaded, extract the folder and look for _ffmpeg.exe_.
