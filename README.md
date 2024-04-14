@@ -4,9 +4,9 @@ A pytube-based Youtube Downloader with a GUI.
 
 # Requirements
 - Python
-- pytube library
-- ffmpeg library
-- <a href="https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0-essentials_build.zip">ffmpeg</a>
+	- pytube
+	- ffmpeg
+- <a href="https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0-essentials_build.zip">ffmpeg.exe</a>
 
 # Setup
 - **Step 1: Install the pytube library.**
