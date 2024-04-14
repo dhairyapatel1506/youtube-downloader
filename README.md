@@ -9,7 +9,7 @@ A pytube-based Youtube Downloader with a GUI.
 - <a href="https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0-essentials_build.zip">ffmpeg.exe</a>
 
 # Download
-If you do not want to set it up yourself, you can download the application directly from <a href="https://github.com/dhairyapatel1506/youtube-downloader/releases">Releases</a>
+If you do not want to set it up yourself, you can download the application directly from <a href="https://github.com/dhairyapatel1506/youtube-downloader/releases">Releases</a>.
 
 # Setup
 - **Step 1: Clone the repository.**
