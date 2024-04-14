@@ -8,15 +8,22 @@ A pytube-based Youtube Downloader with a GUI.
 	- ffmpeg
 - <a href="https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0-essentials_build.zip">ffmpeg.exe</a>
 
+# Download
+If you do not want to set it up yourself, you can download the application directly from <a href="https://github.com/dhairyapatel1506/youtube-downloader/releases">Releases</a>
+
 # Setup
 - **Step 1: Clone the repository.**
   - ```git clone https://github.com/dhairyapatel1506/youtube-downloader.git```
 - **Step 2: Install the python dependencies.**
   - ```pip install -r requirements.txt```
+## Windows
 - **Step 3: Download and setup the ffmpeg executable file.**
   1. You can download the ffmpeg zip file directly from **Requirements** or you can find it on their official <a href="https://ffmpeg.org/download.html">website</a>.
-  2. Once it's downloaded, extract the folder and look for _ffmpeg.exe_.
+  2. Once downloaded, extract it and look for _ffmpeg.exe_.
   3. Now all that's left to do is to move it to the same folder as your python (_main.py_) file.
+## Linux
+- **Step 3: Install ffmpeg.**
+  - ```sudo apt install ffmpeg```
 
 # Usage
 Run: ```python main.py```
@@ -35,9 +42,9 @@ If you do wish to use OAuth, follow these steps:
 - **Step 2:**
   <p align="center"> <img src="https://github.com/dhairyapatel1506/youtube-downloader/assets/101339040/c6c86d89-353a-45b7-99a5-20278fb1fb74"> </p>
   
-    - You should see some text like this at the bottom of the app's interface. Click on it and you'll be redirected to a page on your browser.
-    - Enter your code and click _Continue_.
-    - After successfully completing all the steps on the page, you can close your browser and return to the application.
-    - Finally, click _Authenticate_.
+  - You should see some text like this at the bottom of the app's interface. Click on it and you'll be redirected to a page on your browser.
+  - Enter your code and click _Continue_.
+  - After successfully completing all the steps on the page, you can close your browser and return to the application.
+  - Finally, click on the Authenticate button.
 
 You've successfully completed your OAuth process.
