@@ -57,7 +57,7 @@ You've successfully completed your OAuth process.
 
 # ToDo
   <p>☐ Implement multi-threaded downloading to increase download speeds.</p>
-  <p>☐ Shift the default clients to a separate file to free up space in the code.</p>
+  <p><s>☑ Shift the default clients to a separate file to free up space in the code.</s></p>
   <p>☐ Display time taken to download.</p>
   <p>☐ Add support for downloading in different FPS (Frames Per Second).</p>
 
