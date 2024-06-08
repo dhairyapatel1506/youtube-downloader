@@ -60,6 +60,6 @@ You've successfully completed your OAuth process.
   <p><s>☑ Shift default clients to a separate file to free up space in the code.</s></p>
   <p>☐ Display time taken to download.</p>
   <p>☐ Add support for downloading in different FPS (Frames Per Second).</p>
-  <p>☐ Add the capability to preview a video before downloading it.</p>
-  <p>☐ Add the capability to download multiple videos in a single session.</p>
-  <p>☐ Add the capability to download entire playlists.</p>
+  <p>☐ Add capability to preview a video before downloading it.</p>
+  <p>☐ Add capability to download multiple videos in a single session.</p>
+  <p>☐ Add capability to download entire playlists.</p>
