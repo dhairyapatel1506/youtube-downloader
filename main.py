@@ -2,18 +2,15 @@ from tkinter import *
 from tkinter.ttk import Progressbar
 from pytube import YouTube, request
 from pytube.cli import on_progress
-from pytube.innertube import InnerTube
-from time import time
+from pytube.innertube import InnerTube, _default_clients
 import pytube.request
 import os
 import ffmpeg
 import subprocess
-import shutil
 import time
 import json
 import webbrowser
 import pathlib
-import ssl
 import threading
 
 root = Tk()
@@ -24,12 +21,16 @@ authVar = IntVar()
 authRVar = StringVar(value="no")
 _client_id = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
 _client_secret = 'SboVhoG9s0rNafixCSGGKXAT'
-filename = 'defaultclients.json'
-with open(filename) as f:
-    _default_clients = json.load(f)
+
 _cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
 _token_file = os.path.join(_cache_dir, 'tokens.json')
-ssl._create_default_https_context = ssl._create_stdlib_context
+
+_default_clients["ANDROID"]["context"]["client"]["clientVersion"] = "19.08.35"
+_default_clients["IOS"]["context"]["client"]["clientVersion"] = "19.08.35"
+_default_clients["ANDROID_EMBED"]["context"]["client"]["clientVersion"] = "19.08.35"
+_default_clients["IOS_EMBED"]["context"]["client"]["clientVersion"] = "19.08.35"
+_default_clients["IOS_MUSIC"]["context"]["client"]["clientVersion"] = "6.41"
+_default_clients["ANDROID_MUSIC"] = _default_clients["ANDROID_CREATOR"]
 
 def submit():
     global video
@@ -40,7 +41,6 @@ def submit():
             video = YouTube(url, on_progress_callback=on_progress, use_oauth=True)
         else:
             video = YouTube(url, on_progress_callback=on_progress) 
-        #print(video.streams)
         TitleLabel.config(text=f"Title: {video.title}")
         submitButton.config(state="disabled")
         videoButton.config(state="active")
@@ -277,9 +277,8 @@ def _new_get_throttling_function_name(js: str) -> str:
         # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
         # Bpa.length || iha("")) }};
         # In the above case, `iha` is the relevant function name
-        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&\s*',
-        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])?\([a-z]\)',
-        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)'
+        r'[abc]=(?P<func>[a-zA-Z0-9$]+)\[(?P<idx>\d+)\]\([abc]\),a\.set\([a-zA-Z0-9$\",]+\),'
+        r'[a-zA-Z0-9$]+\.length\|\|(?P<n_func>[a-zA-Z0-9$]+)\(\"\"\)'
     ]
     logger.debug('Finding throttling function name')
     for pattern in function_patterns:
