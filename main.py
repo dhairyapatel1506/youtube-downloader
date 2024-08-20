@@ -40,7 +40,7 @@ def submit():
             authenticateButton.config(state="active")
             video = YouTube(url, on_progress_callback=on_progress, use_oauth=True)
         else:
-            video = YouTube(url, on_progress_callback=on_progress) 
+            video = YouTube(url, on_progress_callback=on_progress)
         TitleLabel.config(text=f"Title: {video.title}")
         submitButton.config(state="disabled")
         videoButton.config(state="active")
@@ -270,13 +270,6 @@ def _new_get_throttling_function_name(js: str) -> str:
         The name of the function used to compute the throttling parameter.
     """
     function_patterns = [
-        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
-        # https://github.com/yt-dlp/yt-dlp/commit/48416bc4a8f1d5ff07d5977659cb8ece7640dcd8
-        # var Bpa = [iha];
-        # ...
-        # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
-        # Bpa.length || iha("")) }};
-        # In the above case, `iha` is the relevant function name
         r'[abc]=(?P<func>[a-zA-Z0-9$]+)\[(?P<idx>\d+)\]\([abc]\),a\.set\([a-zA-Z0-9$\",]+\),'
         r'[a-zA-Z0-9$]+\.length\|\|(?P<n_func>[a-zA-Z0-9$]+)\(\"\"\)'
     ]
