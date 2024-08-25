@@ -60,5 +60,5 @@ You've successfully completed your OAuth process.
   <p>☐ Display time taken to download.</p>
   <p>☐ Add support for downloading in different FPS (Frames Per Second).</p>
   <p>☐ Add capability to preview a video before downloading it.</p>
-  <p>☐ Add capability to download multiple videos in a single session.</p>
+  <p><s>☑ Add capability to download multiple videos in a single session.</s></p>
   <p>☐ Add capability to download entire playlists.</p>
