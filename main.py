@@ -1,11 +1,8 @@
 from tkinter import *
 from tkinter.ttk import Progressbar
-from pytube import YouTube, request
-from pytube.cli import on_progress
-from pytube.innertube import InnerTube, _default_clients
-import pytube.request
+from pytubefix import YouTube, request
+from pytubefix.innertube import InnerTube, _client_id, _client_secret
 import os
-import ffmpeg
 import subprocess
 import time
 import json
@@ -22,8 +19,6 @@ resolutions = ["144p", "240p", "360p", "480p", "720p", "1080p", "1440p", "2160p"
 resVar = StringVar(value=" ") # Stores the selected resolution
 authVar = IntVar() # Used to track authentication
 authRVar = StringVar(value="no") # Stores whether authentication is required 
-_client_id = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
-_client_secret = 'SboVhoG9s0rNafixCSGGKXAT'
 _cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
 _token_file = os.path.join(_cache_dir, 'tokens.json') # Path to the token file for OAuth
 prevUrl = None # Stores previous URL
@@ -198,7 +193,7 @@ def on_progress(stream, chunk, bytes_remaining):
     progressBar.config(value=percentage_of_completion)
     progressBar.update()
 
-def _new_fetch_bearer_token(self):
+def _fetch_bearer_token(self):
     """Fetch an OAuth token."""
     # Subtracting 30 seconds is arbitrary to avoid potential time discrepencies
     start_time = int(time.time() - 30)
@@ -250,39 +245,13 @@ def _new_fetch_bearer_token(self):
         processLabel.config(text=f"Authentication Unsuccessful, press Submit and try again.")
         submitButton.config(state="active")
 
-def __newinit__(self, client='ANDROID_CREATOR', use_oauth=False, allow_cache=True):
-    """
-    Initializes InnerTube object.
-    """
-    self.context = _default_clients[client]['context']
-    self.header = _default_clients[client]['header']
-    self.api_key = _default_clients[client]['api_key']
-    self.access_token = None
-    self.refresh_token = None
-    self.use_oauth = use_oauth
-    self.allow_cache = allow_cache
-
-    # Stored as epoch time
-    self.expires = None
-
-    # Try to load from file if specified
-    if self.use_oauth and self.allow_cache:
-        # Try to load from file if possible
-        if os.path.exists(_token_file):
-            with open(_token_file) as f:
-                data = json.load(f)
-                self.access_token = data['access_token']
-                self.refresh_token = data['refresh_token']
-                self.expires = data['expires']
-                self.refresh_bearer_token()
-
 def callback(url):
     """
     Opens the web browser to the verification URL.
     """
     webbrowser.open_new(url)
 
-def _new_cache_tokens(self):
+def _cache_tokens(self):
         """
         Caches tokens to file if allowed.
         """
@@ -309,46 +278,8 @@ def selectall(event):
     # Moves cursor to the end
     event.widget.icursor('end')
 
-def _new_get_throttling_function_name(js: str) -> str:
-    """
-    Extracts the name of the function that computes the throttling parameter.
-    """
-    import logging
-    import re
-    logger = logging.getLogger(__name__)
-    function_patterns = [
-        r'[abc]=(?P<func>[a-zA-Z0-9$]+)\[(?P<idx>\d+)\]\([abc]\),a\.set\([a-zA-Z0-9$\",]+\),'
-        r'[a-zA-Z0-9$]+\.length\|\|(?P<n_func>[a-zA-Z0-9$]+)\(\"\"\)'
-    ]
-    logger.debug('Finding throttling function name')
-    for pattern in function_patterns:
-        regex = re.compile(pattern)
-        function_match = regex.search(js)
-        if function_match:
-            logger.debug("finished regex search, matched: %s", pattern)
-            if len(function_match.groups()) == 1:
-                return function_match.group(1)
-            idx = function_match.group(2)
-            if idx:
-                idx = idx.strip("[]")
-                array = re.search(
-                    r'var {nfunc}\s*=\s*(\[.+?\]);'.format(
-                        nfunc=re.escape(function_match.group(1))),
-                    js
-                )
-                if array:
-                    array = array.group(1).strip("[]").split(",")
-                    array = [x.strip() for x in array]
-                    return array[int(idx)]
-
-    raise RegexMatchError(
-        caller="_new_get_throttling_function_name", pattern="multiple"
-    )
-
-InnerTube.fetch_bearer_token = _new_fetch_bearer_token
-InnerTube.__init__ = __newinit__ 
-InnerTube.cache_tokens = _new_cache_tokens
-pytube.cipher.get_throttling_function_name = _new_get_throttling_function_name
+InnerTube.fetch_bearer_token = _fetch_bearer_token
+InnerTube.cache_tokens = _cache_tokens
 
 # Defines UI elements
 
