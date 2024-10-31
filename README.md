@@ -4,7 +4,7 @@ A pytube-based Youtube Downloader with a GUI.
 
 # Features
 - Can download different video qualities.
-- Feature to download only audio.
+- Can download audio separately.
 - Can download Shorts.
 - Can bypass age-restricted videos.
 
