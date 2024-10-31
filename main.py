@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Progressbar
 from pytubefix import YouTube, request
-from pytubefix.innertube import InnerTube, _client_id, _client_secret
+from pytubefix.innertube import InnerTube, _client_id, _client_secret, _default_clients, _default_oauth_verifier, _default_po_token_verifier
 import os
 import subprocess
 import time
@@ -9,6 +9,7 @@ import json
 import webbrowser
 import pathlib
 import threading
+import sys
 
 # Initalizes the main Tkinter window
 root = Tk()
@@ -19,7 +20,14 @@ resolutions = ["144p", "240p", "360p", "480p", "720p", "1080p", "1440p", "2160p"
 resVar = StringVar(value=" ") # Stores the selected resolution
 authVar = IntVar() # Used to track authentication
 authRVar = StringVar(value="no") # Stores whether authentication is required 
-_cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
+
+if getattr(sys, 'frozen', False):  # Check if bundled with PyInstaller
+    base_path = pathlib.Path(sys.executable).parent  # Location of the .exe
+else:
+    base_path = pathlib.Path(__file__).parent.resolve()
+
+_cache_dir = base_path / '__cache__'
+
 _token_file = os.path.join(_cache_dir, 'tokens.json') # Path to the token file for OAuth
 prevUrl = None # Stores previous URL
 
@@ -127,8 +135,11 @@ def download():
                 processLabel.config(text="Downloading audio..")
                 reset_progress_bar()
                 out_path = video.streams.get_audio_only().download()
-                idtfier = out_path.split('.')
-                os.rename(out_path, f"{idtfier[0]}.mp3")
+                splitList = out_path.split('.')
+                res = ""
+                for part in splitList[:-1]:
+                    res = res + part
+                os.rename(out_path, f"{splitList[0]}.mp3")
                 processLabel.config(text="Your audio has been downloaded!")
             
             # Video downloads
@@ -144,13 +155,11 @@ def download():
                         processLabel.config(text="Downloading video..")
                         reset_progress_bar()
                         out_path = video.streams.filter(res=resolution, subtype="mp4").first().download()
-                        idtfier = out_path.split('.')
-                        os.rename(out_path, f"Video." + idtfier[-1])
+                        os.rename(out_path, f"Video.mp4")
                         processLabel.config(text="Downloading audio..")
                         reset_progress_bar()
                         out_path = video.streams.get_audio_only().download()
-                        idtfier = out_path.split('.')
-                        os.rename(out_path, f"Audio." + idtfier[-1])
+                        os.rename(out_path, f"Audio.mp4")
                         processLabel.config(text="Merging audio and video files..")
                         subprocess.run(f"ffmpeg -hide_banner -loglevel error -i Video.mp4 -i Audio.mp4 -c copy Output.mp4", shell=True)
                         os.remove("Audio.mp4")
@@ -192,6 +201,68 @@ def on_progress(stream, chunk, bytes_remaining):
     progressLabel.update()
     progressBar.config(value=percentage_of_completion)
     progressBar.update()
+
+def __newinit__(self, client='ANDROID_VR', use_oauth=False, allow_cache=True, token_file=None, oauth_verifier=None,
+            use_po_token=False,
+            po_token_verifier=None):
+    """
+    Initializes InnerTube object.
+    """
+    self.client_name = client
+    self.innertube_context = _default_clients[client]['innertube_context']
+    self.header = _default_clients[client]['header']
+    self.api_key = _default_clients[client]['api_key']
+    self.require_js_player = _default_clients[client]['require_js_player']
+    self.require_po_token = _default_clients[client]['require_po_token']
+    self.access_token = None
+    self.refresh_token = None
+
+    self.access_po_token = None
+    self.access_visitorData = None
+
+    self.use_oauth = use_oauth
+    self.allow_cache = allow_cache
+    self.oauth_verifier = oauth_verifier or _default_oauth_verifier
+
+    # Stored as epoch time
+    self.expires = None
+
+    self.use_po_token = use_po_token
+    self.po_token_verifier = po_token_verifier or _default_po_token_verifier
+
+    # Try to load from file if specified
+    self.token_file = token_file or _token_file
+    if self.use_oauth and self.allow_cache and os.path.exists(self.token_file):
+        with open(self.token_file) as f:
+            data = json.load(f)
+            if data['access_token']:
+                self.access_token = data['access_token']
+                self.refresh_token = data['refresh_token']
+                self.expires = data['expires']
+                self.refresh_bearer_token()
+
+    if self.use_po_token and self.allow_cache and os.path.exists(self.token_file):
+        with open(self.token_file) as f:
+            data = json.load(f)
+            self.access_visitorData = data['visitorData']
+            self.access_po_token = data['po_token']
+
+def _cache_tokens(self):
+        """
+        Caches tokens to file if allowed.
+        """
+        if not self.allow_cache:
+            return
+
+        data = {
+            'access_token': self.access_token,
+            'refresh_token': self.refresh_token,
+            'expires': self.expires
+        }
+        if not os.path.exists(_cache_dir):
+            os.mkdir(_cache_dir)
+        with open(_token_file, 'w') as f:
+            json.dump(data, f)
 
 def _fetch_bearer_token(self):
     """Fetch an OAuth token."""
@@ -251,23 +322,6 @@ def callback(url):
     """
     webbrowser.open_new(url)
 
-def _cache_tokens(self):
-        """
-        Caches tokens to file if allowed.
-        """
-        if not self.allow_cache:
-            return
-
-        data = {
-            'access_token': self.access_token,
-            'refresh_token': self.refresh_token,
-            'expires': self.expires
-        }
-        if not os.path.exists(_cache_dir):
-            os.mkdir(_cache_dir)
-        with open(_token_file, 'w') as f:
-            json.dump(data, f)
-
 def selectall(event):
     """
     Implements functionality for selecting all text in the URL input field using Ctrl A
@@ -278,6 +332,7 @@ def selectall(event):
     # Moves cursor to the end
     event.widget.icursor('end')
 
+InnerTube.__init__ = __newinit__
 InnerTube.fetch_bearer_token = _fetch_bearer_token
 InnerTube.cache_tokens = _cache_tokens
 
