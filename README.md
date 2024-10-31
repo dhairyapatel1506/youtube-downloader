@@ -11,7 +11,7 @@ A pytube-based Youtube Downloader with a GUI.
 # Requirements
 - Python
 	- pytubefix
-- <a href="https://ffmpeg.org/download.html#build-windows">ffmpeg.exe (for Windows)</a>
+- <a href="https://ffmpeg.org/download.html">ffmpeg</a>
 
 # Download
 If you don't want to set it up yourself, you can download the application directly from <a href="https://github.com/dhairyapatel1506/youtube-downloader/releases">Releases</a>.
@@ -23,7 +23,7 @@ If you don't want to set it up yourself, you can download the application direct
   - ```pip install -r requirements.txt```
 ## Windows
 - **Step 3: Download and setup the ffmpeg executable file.**
-  1. Download the ffmpeg zip file from **Requirements**.
+  1. Download the ffmpeg zip file from [Requirements](#Requirements).
   2. Once downloaded, extract it and look for _ffmpeg.exe_.
   3. Now all that's left to do is to move it to the same folder as the _main.py_ file.
 ## Linux
