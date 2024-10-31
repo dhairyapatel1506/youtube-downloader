@@ -47,12 +47,12 @@ If you do wish to use OAuth, follow these steps:
 - **Step 2:**
   <p align="center"> <img src="https://github.com/dhairyapatel1506/youtube-downloader/assets/101339040/c6c86d89-353a-45b7-99a5-20278fb1fb74"> </p>
   
-  - You should see some text like this at the bottom of the app's interface. Click on it and you'll be redirected to a page on your browser.
+  - You should see text like this at the bottom of the app's interface. Click on it and you'll be redirected to a page in your browser.
   - Enter your code and click _Continue_.
-  - After successfully completing all the steps on the page, you can close your browser and return to the application.
+  - After successfully completing all the steps on the page, close your browser and return to the application.
   - Finally, click on the Authenticate button.
 
-You've successfully completed your OAuth process.
+You've successfully completed your OAuth process and can go on to download your video.
 
 # ToDo
   <p>☐ Implement multi-threaded downloading to increase download speeds.</p>
