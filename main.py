@@ -15,8 +15,9 @@ import sys
 root = Tk()
 
 # Global variables and default settings
-video = None
+yt = None
 resolutions = ["144p", "240p", "360p", "480p", "720p", "1080p", "1440p", "2160p"]
+illegalChars = ['<', '>', ':', '"', "/", '\\', '|', '?', '*']
 resVar = StringVar(value=" ") # Stores the selected resolution
 authVar = IntVar() # Used to track authentication
 authRVar = StringVar(value="no") # Stores whether authentication is required 
@@ -29,39 +30,47 @@ else:
 _cache_dir = base_path / '__cache__'
 
 _token_file = os.path.join(_cache_dir, 'tokens.json') # Path to the token file for OAuth
-prevUrl = None # Stores previous URL
+url, prevUrl = None, None # Stores previous URL
+urlSubmitted = False
+
+def ytobject_initializer(url):
+    global yt
+    try:
+        if(authRVar.get()=="yes" or os.path.exists(_token_file)):
+            authenticateButton.config(state="active")
+            yt = YouTube(url, on_progress_callback=on_progress, use_oauth=True)
+        else:
+            yt = YouTube(url, on_progress_callback=on_progress)
+        return yt
+    except Exception as e:
+        if("regex_search" in str(e)):
+            TitleLabel.config(text="Please enter a valid url.")
+        elif("is unavailable" in str(e)):
+            TitleLabel.config(text="Not a valid Youtube video.")
+        else:
+            print(e)
 
 def submit():
     """
     Fetches video info and sets up the UI for downloading.
     """
-    global video
     global prevUrl
+    global urlSubmitted
+    global yt
     url = urlEntry.get().strip() # Gets URL
     if url!=prevUrl: # Checks whether URL has changed
         processLabel.config(text="")
         reset_progress_bar()
         prevUrl = url
-        try:
-            # Checks if authentication is required or token file exists
-            if(authRVar.get()=="yes" or os.path.exists(_token_file)):
-                authenticateButton.config(state="active")
-                video = YouTube(url, on_progress_callback=on_progress, use_oauth=True)
-            else:
-                video = YouTube(url, on_progress_callback=on_progress)
-            # Updates UI for downloading
-            TitleLabel.config(text=f"Title: {video.title}")
-            videoButton.config(state="disabled")
-            audioButton.config(state="active")
-            downloadButton.config(state="active")
-            video_options()
-        except Exception as e:
-            if("regex_search" in str(e)):
-                TitleLabel.config(text="Please enter a valid url.")
-            elif("is unavailable" in str(e)):
-                TitleLabel.config(text="Not a valid Youtube video.")
-            else:
-                print(e)
+
+        yt = ytobject_initializer(url)
+        # Updates UI for downloading
+        TitleLabel.config(text=f"Title: {yt.title}")
+        videoButton.config(state="disabled")
+        audioButton.config(state="active")
+        downloadButton.config(state="active")
+        video_options()
+        urlSubmitted = True
 
 def video_options(disable=False):
     """
@@ -83,12 +92,12 @@ def video_options(disable=False):
         # Displays all the options
         videoLabel = Label(root, text="Options:").pack()
         for res in resolutions:
-            videoStream = video.streams.filter(res=res, subtype="mp4").first()
+            videoStream = yt.streams.filter(res=res, subtype="mp4").first()
             if(videoStream!=None and videoStream.is_adaptive):
                 resRadioButton = Radiobutton(root, text=res, variable=resVar, value=res)
                 resRadioButton.pack()
             else:
-                if(video.streams.get_by_resolution(res)!=None):
+                if(yt.streams.get_by_resolution(res)!=None):
                     resRadioButton = Radiobutton(root, text=res, variable=resVar, value=res)
                     resRadioButton.pack()
 
@@ -129,17 +138,20 @@ def download():
         """
         Function to start download in a separate thread
         """
+        global urlSubmitted
+        global yt
         try:
+            if not urlSubmitted:
+                url = urlEntry.get().strip() # Gets URL
+                yt = ytobject_initializer(url)
+
             # Audio downloads
             if audioButton.cget('state')=="disabled":
                 processLabel.config(text="Downloading audio..")
                 reset_progress_bar()
-                out_path = video.streams.get_audio_only().download()
-                splitList = out_path.split('.')
-                res = ""
-                for part in splitList[:-1]:
-                    res = res + part
-                os.rename(out_path, f"{splitList[0]}.mp3")
+                out_path = yt.streams.get_audio_only().download()
+                time.sleep(1)
+                os.rename(out_path, f"{filenamer(yt.title)}.mp3")
                 processLabel.config(text="Your audio has been downloaded!")
             
             # Video downloads
@@ -151,27 +163,29 @@ def download():
                     processLabel.config(fg="black")
 
                     # Checks if adaptive stream is available
-                    if (video.streams.filter(res=resolution, subtype="mp4").first()).is_adaptive: 
+                    if (yt.streams.filter(res=resolution, subtype="mp4").first()).is_adaptive: 
                         processLabel.config(text="Downloading video..")
                         reset_progress_bar()
-                        out_path = video.streams.filter(res=resolution, subtype="mp4").first().download()
+                        out_path = yt.streams.filter(res=resolution, subtype="mp4").first().download()
                         os.rename(out_path, f"Video.mp4")
                         processLabel.config(text="Downloading audio..")
                         reset_progress_bar()
-                        out_path = video.streams.get_audio_only().download()
+                        out_path = yt.streams.get_audio_only().download()
                         os.rename(out_path, f"Audio.mp4")
                         processLabel.config(text="Merging audio and video files..")
                         subprocess.run(f"ffmpeg -hide_banner -loglevel error -i Video.mp4 -i Audio.mp4 -c copy Output.mp4", shell=True)
                         os.remove("Audio.mp4")
                         os.remove("Video.mp4")
+                        os.rename("Output.mp4", f"{filenamer(yt.title)}.mp4")
                         processLabel.config(text="Your video has been downloaded!")
 
                     # Uses progressive stream
                     else:
                         processLabel.config(text="Downloading video..")
                         reset_progress_bar()
-                        out_path = video.streams.filter(progressive=True, res=resolution).first().download()
+                        out_path = yt.streams.filter(progressive=True, res=resolution).first().download()
                         processLabel.config(text="Your video has been downloaded!")
+
                 else:
                     processLabel.config(text="Are you BLIND? Select an option first!", fg='red')
 
@@ -180,6 +194,7 @@ def download():
         finally:
             # Re-enables the download button after completion
             downloadButton.config(state="active")
+            urlSubmitted = False
 
     # Disables the download button while downloading
     downloadButton.config(state="disabled")
@@ -202,7 +217,7 @@ def on_progress(stream, chunk, bytes_remaining):
     progressBar.config(value=percentage_of_completion)
     progressBar.update()
 
-def __newinit__(self, client='ANDROID_VR', use_oauth=False, allow_cache=True, token_file=None, oauth_verifier=None,
+def __newinit__(self, client='MWEB', use_oauth=False, allow_cache=True, token_file=None, oauth_verifier=None,
             use_po_token=False,
             po_token_verifier=None):
     """
@@ -331,6 +346,15 @@ def selectall(event):
 
     # Moves cursor to the end
     event.widget.icursor('end')
+
+def filenamer(vidTitle):
+    filename = ""
+    for char in vidTitle:
+        if char in illegalChars:
+            pass
+        else:
+            filename = filename + char
+    return filename.replace("  ", " ").strip()
 
 InnerTube.__init__ = __newinit__
 InnerTube.fetch_bearer_token = _fetch_bearer_token
