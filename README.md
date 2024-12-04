@@ -58,6 +58,6 @@ You've successfully completed your OAuth process and can go on to download your 
   <p>☐ Implement multi-threaded downloading to increase download speeds.</p>
   <p>☐ Display time taken to download.</p>
   <p>☐ Add support for downloading in different FPS (Frames Per Second).</p>
-  <p>☐ Add capability to preview a video before downloading it.</p>
+  <p>☐ Add feature to preview a video before downloading it.</p>
   <p><s>☑ Add capability to download multiple videos in a single session.</s></p>
-  <p>☐ Add capability to download entire playlists.</p>
+  <p>☐ Add feature to download entire playlists.</p>
